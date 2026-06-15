@@ -5,80 +5,133 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FIRE Calculator — Plan Your Financial Independence</title>
 <meta name="description" content="An interactive calculator that maps your path across every flavor of Financial Independence — Coast, Lean, regular, and Fat FIRE — based on your savings, portfolio allocation, and return assumptions.">
-<meta name="theme-color" content="#0f1419">
+<meta name="theme-color" content="#ffffff">
 <!-- Social share preview -->
 <meta property="og:title" content="FIRE Calculator — Plan Your Financial Independence">
 <meta property="og:description" content="Interactive tool charting your journey to Coast, Lean, regular, and Fat FIRE.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1419;
-    --panel: #1a2129;
-    --panel-2: #232c38;
-    --text: #e6edf3;
-    --muted: #8b97a7;
-    --port: #2ecc71;   /* portfolio */
-    --coast: #b07cff;  /* coast fire */
-    --lean: #2dd4bf;   /* lean fire */
-    --fire: #4aa3ff;   /* regular fire */
-    --fat: #f5b941;    /* fat fire */
-    --marker: #ff6b6b;
-    --stock: #4f8cff;  /* allocation: stocks */
-    --bond: #a78bfa;   /* allocation: bonds */
-    --cash: #2ecc71;   /* allocation: cash */
-    --grid: #2a3441;
-    --border: #2a3441;
+    /* shadcn-style neutral (zinc) tokens */
+    --background: #ffffff;
+    --card: #ffffff;
+    --foreground: #09090b;
+    --muted: #71717a;            /* muted-foreground */
+    --muted-bg: #f4f4f5;
+    --accent-bg: #f4f4f5;
+    --border: #e4e4e7;
+    --ring: #18181b;
+    --primary: #18181b;
+    --radius: 0.625rem;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+    /* chart / semantic colors (read by canvas via getCss) */
+    --text: #09090b;
+    --grid: #f0f0f1;
+    --port: #22c55e;   /* portfolio */
+    --coast: #8b5cf6;  /* coast fire */
+    --lean: #14b8a6;   /* lean fire */
+    --fire: #3b82f6;   /* regular fire */
+    --fat: #f59e0b;    /* fat fire */
+    --marker: #ef4444;
+    --stock: #3b82f6;  /* allocation: stocks */
+    --bond: #8b5cf6;   /* allocation: bonds */
+    --cash: #22c55e;   /* allocation: cash */
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.4;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--background); color: var(--foreground); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh; display: flex; flex-direction: column; overflow: hidden;
   }
-  header { padding: 24px 28px 12px; border-bottom: 1px solid var(--border); }
-  header h1 { margin: 0; font-size: 22px; letter-spacing: -0.5px; }
-  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-  .layout { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 78px); }
-  @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
-  .controls { padding: 20px 24px; border-right: 1px solid var(--border); overflow-y: auto; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border); flex: 0 0 auto; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
+  .layout { display: grid; grid-template-columns: 340px 1fr; flex: 1 1 auto; min-height: 0; }
+  .controls { padding: 22px 24px; border-right: 1px solid var(--border); overflow-y: auto; background: var(--background); }
   .field { margin-bottom: 18px; }
-  .field label { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-  .field .val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .field input[type=range] { width: 100%; accent-color: var(--port); margin: 0; }
-  .field input[type=number] { width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 7px; font-size: 14px; font-variant-numeric: tabular-nums; }
-  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 22px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-  .section-title:first-child { margin-top: 0; }
-  .main { padding: 20px 24px; display: flex; flex-direction: column; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .field label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--foreground); margin-bottom: 8px; }
+  .field label > span:first-child { display: inline-flex; align-items: center; }
+  .field .val { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+  /* shadcn slider */
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 9999px; background: var(--muted-bg); outline: none; cursor: pointer; margin: 4px 0; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 9999px; background: var(--background); border: 2px solid var(--primary); box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow .15s; }
+  input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 4px rgb(24 24 27 / 0.08); }
+  input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(24 24 27 / 0.18); }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 9999px; background: var(--background); border: 2px solid var(--primary); box-shadow: var(--shadow-sm); cursor: pointer; }
+  input[type=range]::-moz-range-track { height: 6px; border-radius: 9999px; background: var(--muted-bg); }
+  /* shadcn input */
+  input[type=number], input.money { width: 100%; height: 38px; background: var(--background); border: 1px solid var(--border); color: var(--foreground); padding: 0 12px; border-radius: calc(var(--radius) - 2px); font-size: 14px; font-family: inherit; font-variant-numeric: tabular-nums; transition: border-color .15s, box-shadow .15s; }
+  input[type=number]:focus, input.money:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px rgb(24 24 27 / 0.10); }
+  /* collapsible sections */
+  .section { border-bottom: 1px solid var(--border); }
+  .section:first-of-type { border-top: 1px solid var(--border); }
+  .section-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; list-style: none; user-select: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); padding: 14px 0; transition: color .12s; }
+  .section-title::-webkit-details-marker { display: none; }
+  .section-title:hover { color: var(--foreground); }
+  .section-title .chevron { width: 8px; height: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .18s ease; flex: 0 0 auto; margin-right: 2px; }
+  .section[open] > .section-title .chevron { transform: rotate(45deg); }
+  .section-body { padding-bottom: 8px; }
+  .badge { display: inline-flex; align-items: center; border: 1px solid var(--border); background: var(--muted-bg); color: var(--muted); font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 9999px; letter-spacing: 0; text-transform: none; }
+  .main { padding: 20px 24px; display: flex; flex-direction: column; background: #fafafa; min-height: 0; overflow: hidden; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
   @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; border-left: 4px solid var(--border); }
-  .card .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
-  .card .v { font-size: 20px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
-  .card .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .card.coast { border-left-color: var(--coast); }
-  .card.lean  { border-left-color: var(--lean); }
-  .card.fire  { border-left-color: var(--fire); }
-  .card.fat   { border-left-color: var(--fat); }
-  .chart-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; flex: 1; min-height: 340px; position: relative; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
+  .card .k { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .card .k::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; background: var(--border); flex: 0 0 auto; }
+  .card.coast .k::before { background: var(--coast); }
+  .card.lean  .k::before { background: var(--lean); }
+  .card.fire  .k::before { background: var(--fire); }
+  .card.fat   .k::before { background: var(--fat); }
+  .card .v { font-size: 26px; font-weight: 600; margin-top: 6px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .card .sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; flex: 1 1 0; min-height: 220px; position: relative; box-shadow: var(--shadow-sm); }
   canvas { width: 100%; height: 100%; display: block; }
-  .tooltip { position: absolute; pointer-events: none; background: #0b0f14; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; opacity: 0; transition: opacity .08s; white-space: nowrap; z-index: 5; }
-  .tooltip b { color: var(--text); }
-  .legend { margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 22px; }
+  .tooltip { position: absolute; pointer-events: none; background: var(--foreground); color: #fafafa; border-radius: calc(var(--radius) - 2px); padding: 6px 10px; font-size: 12px; box-shadow: var(--shadow); opacity: 0; transition: opacity .1s; white-space: nowrap; z-index: 5; }
+  .tooltip b { color: #fff; font-weight: 600; }
+  .legend { margin-top: 18px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
   @media (max-width: 760px) { .legend { grid-template-columns: 1fr; } }
-  .legend .item { display: flex; gap: 9px; font-size: 12px; align-items: flex-start; }
-  .legend .swatch { width: 14px; height: 14px; border-radius: 3px; flex: 0 0 auto; margin-top: 1px; }
+  /* On narrow screens, stack and allow normal page scrolling instead of pinning to the viewport. */
+  @media (max-width: 880px) {
+    body { height: auto; display: block; overflow: visible; }
+    .layout { grid-template-columns: 1fr; min-height: 0; }
+    .controls { overflow-y: visible; border-right: none; border-bottom: 1px solid var(--border); }
+    .main { overflow: visible; }
+    .chart-wrap { min-height: 320px; }
+  }
+  .legend .item { display: flex; gap: 10px; font-size: 12.5px; align-items: flex-start; }
+  .legend .swatch { width: 13px; height: 13px; border-radius: 4px; flex: 0 0 auto; margin-top: 2px; }
   .legend .swatch.line { height: 3px; margin-top: 7px; border-radius: 2px; }
-  .legend .name { font-weight: 700; color: var(--text); }
+  .legend .name { font-weight: 600; color: var(--foreground); }
   .legend .def { color: var(--muted); }
-  .note { font-size: 11px; color: var(--muted); margin-top: 14px; }
-  .alloc-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin-bottom: 14px; background: var(--panel-2); border: 1px solid var(--border); }
-  .alloc-bar span { display: block; height: 100%; transition: width .12s ease; }
+  .note { font-size: 11.5px; color: var(--muted); margin-top: 16px; }
+  .alloc-bar { display: flex; height: 12px; border-radius: 9999px; overflow: hidden; margin-bottom: 16px; background: var(--muted-bg); }
+  .alloc-bar span { display: block; height: 100%; transition: width .15s ease; }
   .alloc-bar .s { background: var(--stock); }
   .alloc-bar .b { background: var(--bond); }
   .alloc-bar .c { background: var(--cash); }
-  .swatch-i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 4px; vertical-align: baseline; }
+  .swatch-i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; margin-right: 6px; }
+  /* chart toolbar + shadcn switch */
+  .chart-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .switch-wrap { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .switch { position: relative; width: 38px; height: 22px; flex: 0 0 auto; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .knob { position: absolute; inset: 0; background: var(--muted-bg); border: 1px solid var(--border); border-radius: 9999px; transition: background .15s, border-color .15s; }
+  .switch .knob::before { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 9999px; background: #fff; box-shadow: var(--shadow-sm); transition: transform .15s; }
+  .switch input:checked + .knob { background: var(--primary); border-color: var(--primary); }
+  .switch input:checked + .knob::before { transform: translateX(16px); }
+  .switch input:focus-visible + .knob { box-shadow: 0 0 0 3px rgb(24 24 27 / 0.18); }
+  .switch-label { font-size: 13px; font-weight: 500; }
+  .info { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 9999px; font-size: 10px; font-style: italic; font-weight: 600; color: var(--muted); cursor: help; }
+  .info .info-tip { position: absolute; bottom: calc(100% + 8px); left: 0; transform: translateX(-12px); width: 250px; background: var(--foreground); color: #fafafa; font-size: 12px; font-style: normal; font-weight: 400; line-height: 1.45; padding: 9px 11px; border-radius: calc(var(--radius) - 2px); box-shadow: var(--shadow); opacity: 0; visibility: hidden; transition: opacity .12s; z-index: 10; }
+  .info:hover .info-tip, .info:focus .info-tip { opacity: 1; visibility: visible; }
 </style>
 </head>
 <body>
@@ -89,79 +142,105 @@
 
 <div class="layout">
   <div class="controls">
-    <div class="section-title">You</div>
-    <div class="field">
-      <label>Current age <span class="val" id="ageVal"></span></label>
-      <input type="range" id="age" min="18" max="65" step="1" value="30">
-    </div>
-    <div class="field">
-      <label>Current portfolio / savings</label>
-      <input type="number" id="netWorth" value="50000" step="1000">
-    </div>
+    <details class="section" open>
+      <summary class="section-title">You <span class="chevron"></span></summary>
+      <div class="section-body">
+        <div class="field">
+          <label>Current age <span class="val" id="ageVal"></span></label>
+          <input type="range" id="age" min="18" max="65" step="1" value="30">
+        </div>
+      </div>
+    </details>
 
-    <div class="section-title">Portfolio allocation</div>
-    <div class="alloc-bar"><span class="s" id="segStock"></span><span class="b" id="segBond"></span><span class="c" id="segCash"></span></div>
-    <div class="field">
-      <label><span><span class="swatch-i" style="background:var(--stock)"></span>Stocks</span> <span class="val" id="stockVal"></span></label>
-      <input type="range" id="stock" min="0" max="100" step="5" value="80">
-    </div>
-    <div class="field">
-      <label><span><span class="swatch-i" style="background:var(--bond)"></span>Bonds</span> <span class="val" id="bondVal"></span></label>
-      <input type="range" id="bond" min="0" max="100" step="5" value="15">
-    </div>
-    <div class="field">
-      <label><span><span class="swatch-i" style="background:var(--cash)"></span>Cash <span class="val" id="cashVal"></span></span> <span class="note" style="margin:0">auto-balanced</span></label>
-    </div>
+    <details class="section" open>
+      <summary class="section-title">Cash flow (annual) <span class="chevron"></span></summary>
+      <div class="section-body">
+        <div class="field">
+          <label>Take-home income <span class="badge">post-tax</span></label>
+          <input type="text" inputmode="numeric" class="money" id="income" value="80,000">
+        </div>
+        <div class="field">
+          <label>Annual spending <span class="val" id="srVal"></span></label>
+          <input type="text" inputmode="numeric" class="money" id="spending" value="45,000">
+        </div>
+      </div>
+    </details>
 
-    <div class="section-title">Cash flow (annual)</div>
-    <div class="field">
-      <label>Take-home income <span class="val" style="color:var(--muted);font-weight:400">post-tax</span></label>
-      <input type="number" id="income" value="80000" step="1000">
-    </div>
-    <div class="field">
-      <label>Annual spending <span class="val" id="srVal"></span></label>
-      <input type="number" id="spending" value="45000" step="1000">
-    </div>
+    <details class="section" open>
+      <summary class="section-title">Portfolio allocation <span class="chevron"></span></summary>
+      <div class="section-body">
+        <div class="field">
+          <label>Current portfolio amount</label>
+          <input type="text" inputmode="numeric" class="money" id="netWorth" value="50,000">
+        </div>
+        <div class="alloc-bar"><span class="s" id="segStock"></span><span class="b" id="segBond"></span><span class="c" id="segCash"></span></div>
+        <div class="field">
+          <label><span><span class="swatch-i" style="background:var(--stock)"></span>Stocks</span> <span class="val" id="stockVal"></span></label>
+          <input type="range" id="stock" min="0" max="100" step="5" value="80">
+        </div>
+        <div class="field">
+          <label><span><span class="swatch-i" style="background:var(--bond)"></span>Bonds</span> <span class="val" id="bondVal"></span></label>
+          <input type="range" id="bond" min="0" max="100" step="5" value="15">
+        </div>
+        <div class="field">
+          <label><span><span class="swatch-i" style="background:var(--cash)"></span>Cash <span class="val" id="cashVal"></span></span> <span class="badge">auto-balanced</span></label>
+        </div>
+      </div>
+    </details>
 
-    <div class="section-title">Return assumptions (real)</div>
-    <div class="field">
-      <label>Stocks return <span class="val" id="stockRetVal"></span></label>
-      <input type="range" id="stockRet" min="0" max="10" step="0.5" value="5">
-    </div>
-    <div class="field">
-      <label>Bonds return <span class="val" id="bondRetVal"></span></label>
-      <input type="range" id="bondRet" min="-1" max="5" step="0.5" value="1.5">
-    </div>
-    <div class="field">
-      <label>Cash return <span class="val" id="cashRetVal"></span></label>
-      <input type="range" id="cashRet" min="-2" max="3" step="0.5" value="0">
-    </div>
-    <div class="field">
-      <label>Blended real return <span class="val" id="returnVal"></span></label>
-      <div class="note" style="margin-top:0">Weighted average of the three returns above, by allocation.</div>
-    </div>
-    <div class="field">
-      <label>Safe withdrawal rate <span class="val" id="swrVal"></span></label>
-      <input type="range" id="swr" min="2.5" max="6" step="0.1" value="4">
-    </div>
-    <div class="field">
-      <label>Income growth <span class="val" id="growthVal"></span></label>
-      <input type="range" id="growth" min="0" max="6" step="0.1" value="1">
-    </div>
+    <details class="section" open>
+      <summary class="section-title">Return assumptions (real) <span class="chevron"></span></summary>
+      <div class="section-body">
+        <div class="field">
+          <label>Stocks return <span class="val" id="stockRetVal"></span></label>
+          <input type="range" id="stockRet" min="0" max="10" step="0.5" value="5">
+        </div>
+        <div class="field">
+          <label>Bonds return <span class="val" id="bondRetVal"></span></label>
+          <input type="range" id="bondRet" min="-1" max="5" step="0.5" value="1.5">
+        </div>
+        <div class="field">
+          <label>Cash return <span class="val" id="cashRetVal"></span></label>
+          <input type="range" id="cashRet" min="-2" max="3" step="0.5" value="0">
+        </div>
+        <div class="field">
+          <label>Blended real return <span class="val" id="returnVal"></span></label>
+          <div class="note" style="margin-top:0">Weighted average of the three returns above, by allocation.</div>
+        </div>
+        <div class="field">
+          <label>Safe withdrawal rate <span class="val" id="swrVal"></span></label>
+          <input type="range" id="swr" min="2.5" max="6" step="0.1" value="4">
+        </div>
+        <div class="field">
+          <label>Income growth <span class="val" id="growthVal"></span></label>
+          <input type="range" id="growth" min="0" max="6" step="0.1" value="1">
+        </div>
+        <div class="field">
+          <label>Assumed inflation <span class="val" id="inflVal"></span></label>
+          <input type="range" id="inflation" min="0" max="6" step="0.1" value="3">
+          <div class="note" style="margin-top:6px">Only used by the “inflation-adjusted” toggle above the chart.</div>
+        </div>
+      </div>
+    </details>
 
-    <div class="section-title">Milestone tuning</div>
-    <div class="field">
-      <label>Lean budget <span class="val" id="leanVal"></span></label>
-      <input type="range" id="lean" min="40" max="90" step="5" value="65">
-    </div>
-    <div class="field">
-      <label>Fat budget <span class="val" id="fatVal"></span></label>
-      <input type="range" id="fat" min="120" max="300" step="10" value="180">
-    </div>
-    <div class="field">
-      <label>Coast target age <span class="val" id="retVal"></span></label>
-      <input type="range" id="retAge" min="50" max="70" step="1" value="65">
-    </div>
+    <details class="section" open>
+      <summary class="section-title">Milestone tuning <span class="chevron"></span></summary>
+      <div class="section-body">
+        <div class="field">
+          <label>Lean budget <span class="val" id="leanVal"></span></label>
+          <input type="range" id="lean" min="40" max="90" step="5" value="65">
+        </div>
+        <div class="field">
+          <label>Fat budget <span class="val" id="fatVal"></span></label>
+          <input type="range" id="fat" min="120" max="300" step="10" value="180">
+        </div>
+        <div class="field">
+          <label>Coast target age <span class="val" id="retVal"></span></label>
+          <input type="range" id="retAge" min="50" max="70" step="1" value="65">
+        </div>
+      </div>
+    </details>
+
     <div class="note">All figures are in today's dollars — returns, growth and the withdrawal rate are real (inflation-adjusted).</div>
   </div>
 
@@ -187,6 +266,14 @@
         <div class="v" id="fatV2">—</div>
         <div class="sub" id="fatS">&nbsp;</div>
       </div>
+    </div>
+
+    <div class="chart-toolbar">
+      <label class="switch-wrap">
+        <span class="switch"><input type="checkbox" id="nominalToggle"><span class="knob"></span></span>
+        <span class="switch-label">Inflation-adjusted (future dollars)</span>
+      </label>
+      <span class="info" tabindex="0">i<span class="info-tip">Switches every figure from today's dollars to the actual dollars of each future year, using your assumed inflation rate. Your goals rise over time, so the targets grow with inflation — but the age you reach each milestone doesn't change.</span></span>
     </div>
 
     <div class="chart-wrap">
@@ -216,8 +303,31 @@ const fmt = n => {
   return '$' + Math.round(n);
 };
 const fmtFull = n => '$' + Math.round(n).toLocaleString();
+// Read a comma-formatted money input as a number.
+const numVal = id => +($(id).value.replace(/[^\d.]/g, '')) || 0;
 
-const inputs = ['age','netWorth','income','spending','stockRet','bondRet','cashRet','swr','growth','lean','fat','retAge'];
+const inputs = ['age','stockRet','bondRet','cashRet','swr','growth','inflation','lean','fat','retAge'];
+const moneyInputs = ['netWorth','income','spending'];
+
+// Live thousands-separator formatting that keeps the caret in place.
+function formatMoneyInput(el) {
+  const digitsBefore = el.value.slice(0, el.selectionStart ?? el.value.length).replace(/\D/g, '').length;
+  const raw = el.value.replace(/\D/g, '');
+  el.value = raw === '' ? '' : Number(raw).toLocaleString('en-US');
+  // restore caret after the same number of digits
+  let pos = el.value.length, seen = 0;
+  if (digitsBefore === 0) { pos = 0; }
+  else for (let i = 0; i < el.value.length; i++) {
+    if (/\d/.test(el.value[i])) seen++;
+    if (seen === digitsBefore) { pos = i + 1; break; }
+  }
+  try { el.setSelectionRange(pos, pos); } catch (_) {}
+}
+
+// Inflation display transform: in nominal mode, a real value at year Y becomes future dollars.
+const nominalOn = () => $('nominalToggle').checked;
+const inflRate = () => +$('inflation').value / 100;
+const disp = (val, year) => nominalOn() ? val * Math.pow(1 + inflRate(), year) : val;
 let model = null;
 
 // Stocks + bonds + cash must sum to 100. Whichever slider the user drags stays authoritative.
@@ -239,9 +349,9 @@ function getAlloc() {
 
 function compute() {
   const age = +$('age').value;
-  const nw = +$('netWorth').value;
-  const income0 = +$('income').value;
-  const spending = +$('spending').value;
+  const nw = numVal('netWorth');
+  const income0 = numVal('income');
+  const spending = numVal('spending');
   const r = getAlloc().blended;
   const swr = +$('swr').value / 100;
   const g = +$('growth').value / 100;
@@ -301,24 +411,36 @@ function updateLabels() {
   $('returnVal').textContent = (a.blended * 100).toFixed(2) + '%';
   $('swrVal').textContent = (+$('swr').value).toFixed(1) + '%';
   $('growthVal').textContent = (+$('growth').value).toFixed(1) + '%';
+  $('inflVal').textContent = (+$('inflation').value).toFixed(1) + '%';
   $('leanVal').textContent = $('lean').value + '% of spend';
   $('fatVal').textContent = $('fat').value + '% of spend';
   $('retVal').textContent = 'age ' + $('retAge').value;
   $('leanPct').textContent = $('lean').value;
   $('fatPct').textContent = $('fat').value;
-  const sr = (+$('income').value - +$('spending').value) / Math.max(1, +$('income').value);
+  const inc = numVal('income');
+  const sr = (inc - numVal('spending')) / Math.max(1, inc);
   $('srVal').textContent = (sr * 100).toFixed(0) + '% saved';
+}
+
+// shadcn-style filled slider track: color the portion left of the thumb.
+function paintRange(el) {
+  const min = +el.min, max = +el.max, v = +el.value;
+  const pct = max > min ? ((v - min) / (max - min)) * 100 : 0;
+  el.style.background = `linear-gradient(to right, var(--primary) ${pct}%, var(--muted-bg) ${pct}%)`;
 }
 
 function render() {
   updateLabels();
+  document.querySelectorAll('input[type=range]').forEach(paintRange);
   model = compute();
   const m = model;
-  // Coast card shows the target at the user's CURRENT age (what they'd need today).
+  // In nominal mode, lean/FIRE/fat show the dollars you'll need at the age you reach them.
+  // Coast is always "what you'd need invested today" — a present-value figure, so it doesn't inflate.
+  const nom = (val, yr) => disp(val, yr ?? 0);
   setCard('coastV','coastS', m.coastTarget(m.age), m.milestones.coast, m.age);
-  setCard('leanV2','leanS', m.leanNumber, m.milestones.lean, m.age);
-  setCard('fireV','fireS',  m.fireNumber, m.milestones.fire, m.age);
-  setCard('fatV2','fatS',   m.fatNumber,  m.milestones.fat,  m.age);
+  setCard('leanV2','leanS', nom(m.leanNumber, m.milestones.lean), m.milestones.lean, m.age);
+  setCard('fireV','fireS',  nom(m.fireNumber, m.milestones.fire), m.milestones.fire, m.age);
+  setCard('fatV2','fatS',   nom(m.fatNumber,  m.milestones.fat),  m.milestones.fat,  m.age);
   draw();
 }
 
@@ -341,7 +463,9 @@ function draw() {
   const W = cw - padL - padR, H = ch - padT - padB;
   const data = m.series;
   const maxYear = data[data.length - 1].year || 1;
-  const maxBal = Math.max(m.fatNumber * 1.08, ...data.map(d => d.balance));
+  const dispBal = data.map(d => disp(d.balance, d.year));
+  const dispCoast = data.map(d => disp(d.coast, d.year));
+  const maxBal = Math.max(disp(m.fatNumber, maxYear) * 1.08, ...dispBal);
 
   const x = yr => padL + (yr / maxYear) * W;
   const y = bal => padT + H - (Math.min(bal, maxBal) / maxBal) * H;
@@ -360,7 +484,7 @@ function draw() {
   const xStep = Math.max(1, Math.ceil(maxYear / 8));
   for (let yr = 0; yr <= maxYear; yr += xStep) ctx.fillText('age ' + (m.age + yr), x(yr), padT + H + 8);
 
-  // horizontal target lines
+  // target curves — flat in real $, rising with inflation in nominal $
   const targets = [
     { v: m.leanNumber, c: getCss('--lean'), label: 'Lean' },
     { v: m.fireNumber, c: getCss('--fire'), label: 'FIRE' },
@@ -368,32 +492,35 @@ function draw() {
   ];
   ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5;
   targets.forEach(t => {
-    if (t.v > maxBal) return;
     ctx.strokeStyle = t.c; ctx.beginPath();
-    ctx.moveTo(padL, y(t.v)); ctx.lineTo(padL + W, y(t.v)); ctx.stroke();
-    ctx.fillStyle = t.c; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-    ctx.fillText(t.label + ' ' + fmt(t.v), padL + W, y(t.v) - 3);
+    data.forEach((d, i) => { const px = x(d.year), py = y(disp(t.v, d.year)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    ctx.stroke();
+    const endVal = disp(t.v, maxYear);
+    if (endVal <= maxBal) {
+      ctx.fillStyle = t.c; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+      ctx.fillText(t.label + ' ' + fmt(endVal), padL + W, y(endVal) - 3);
+    }
   });
   ctx.setLineDash([]);
 
   // Coast FIRE curve
   ctx.strokeStyle = getCss('--coast'); ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
   ctx.beginPath();
-  data.forEach((d, i) => { const px = x(d.year), py = y(d.coast); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+  data.forEach((d, i) => { const px = x(d.year), py = y(dispCoast[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
   ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle = getCss('--coast'); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillText('Coast', x(0) + 4, y(data[0].coast) + 4);
+  ctx.fillText('Coast', x(0) + 4, y(dispCoast[0]) + 4);
 
   // portfolio area + line
   const grad = ctx.createLinearGradient(0, padT, 0, padT + H);
-  grad.addColorStop(0, 'rgba(46,204,113,0.26)');
-  grad.addColorStop(1, 'rgba(46,204,113,0.02)');
+  grad.addColorStop(0, 'rgba(34,197,94,0.20)');
+  grad.addColorStop(1, 'rgba(34,197,94,0.01)');
   ctx.beginPath(); ctx.moveTo(x(0), y(0));
-  data.forEach(d => ctx.lineTo(x(d.year), y(d.balance)));
+  data.forEach((d, i) => ctx.lineTo(x(d.year), y(dispBal[i])));
   ctx.lineTo(x(maxYear), y(0)); ctx.closePath();
   ctx.fillStyle = grad; ctx.fill();
   ctx.beginPath();
-  data.forEach((d, i) => { const px = x(d.year), py = y(d.balance); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+  data.forEach((d, i) => { const px = x(d.year), py = y(dispBal[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
   ctx.strokeStyle = getCss('--port'); ctx.lineWidth = 2.5; ctx.stroke();
 
   // milestone markers
@@ -407,7 +534,7 @@ function draw() {
   markerDefs.forEach(md => {
     if (md.y === null) return;
     const d = data.find(p => p.year === md.y); if (!d) return;
-    const px = x(d.year), py = y(d.balance);
+    const px = x(d.year), py = y(disp(d.balance, d.year));
     ctx.fillStyle = getCss('--marker');
     ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
@@ -417,8 +544,8 @@ function draw() {
   if (hoverYear !== null) {
     const hy = Math.max(0, Math.min(maxYear, hoverYear));
     const d = data.find(p => p.year === hy) || data[data.length - 1];
-    const px = x(d.year), py = y(d.balance);
-    ctx.strokeStyle = 'rgba(230,237,243,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    const px = x(d.year), py = y(disp(d.balance, d.year));
+    ctx.strokeStyle = 'rgba(9,9,11,0.22)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
     ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, padT + H); ctx.stroke();
     ctx.setLineDash([]);
     // dot on the portfolio line
@@ -454,16 +581,20 @@ canvas.addEventListener('mousemove', e => {
   const yr = Math.round(((mx - geom.padL) / geom.W) * geom.maxYear);
   if (yr !== hoverYear) { hoverYear = yr; draw(); }
   const d = geom.data.find(p => p.year === yr) || geom.data[geom.data.length - 1];
+  const shown = disp(d.balance, d.year);
   const pctFire = Math.min(100, (d.balance / m.fireNumber) * 100);
-  tip.innerHTML = `Age <b>${d.age}</b> · year <b>${d.year}</b> · <b>${fmtFull(d.balance)}</b> · ${pctFire.toFixed(0)}% of FIRE`;
-  tip.style.left = Math.min(geom.x(d.year) + 12, rect.width - 230) + 'px';
-  tip.style.top = (geom.y(d.balance) - 10) + 'px';
+  const unit = nominalOn() ? ` <span style="opacity:.65">(${m.age + d.year} $)</span>` : '';
+  tip.innerHTML = `Age <b>${d.age}</b> · year <b>${d.year}</b> · <b>${fmtFull(shown)}</b>${unit} · ${pctFire.toFixed(0)}% of FIRE`;
+  tip.style.left = Math.min(geom.x(d.year) + 12, rect.width - 250) + 'px';
+  tip.style.top = (geom.y(shown) - 10) + 'px';
   tip.style.opacity = 1;
 });
 canvas.addEventListener('mouseleave', () => { $('tip').style.opacity = 0; if (hoverYear !== null) { hoverYear = null; draw(); } });
 
 inputs.forEach(id => $(id).addEventListener('input', render));
+moneyInputs.forEach(id => $(id).addEventListener('input', e => { formatMoneyInput(e.target); render(); }));
 ['stock','bond'].forEach(id => $(id).addEventListener('input', () => { balanceAlloc(id); render(); }));
+$('nominalToggle').addEventListener('change', render);
 window.addEventListener('resize', () => model && draw());
 render();
 </script>
