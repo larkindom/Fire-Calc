@@ -81,23 +81,37 @@
   .section-body { padding-bottom: 8px; }
   .badge { display: inline-flex; align-items: center; border: 1px solid var(--border); background: var(--muted-bg); color: var(--muted); font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 9999px; letter-spacing: 0; text-transform: none; }
   .main { padding: 20px 24px; display: flex; flex-direction: column; background: #fafafa; min-height: 0; overflow: hidden; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
-  @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
-  .card .k { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--muted); }
-  .card .k::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; background: var(--border); flex: 0 0 auto; }
-  .card.coast .k::before { background: var(--coast); }
-  .card.lean  .k::before { background: var(--lean); }
-  .card.fire  .k::before { background: var(--fire); }
-  .card.fat   .k::before { background: var(--fat); }
-  .card .v { font-size: 26px; font-weight: 600; margin-top: 6px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .card .sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  /* milestone tabs */
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 1100px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+  .tab { text-align: left; background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--border); border-radius: var(--radius); padding: 11px 14px 13px; cursor: pointer; font-family: inherit; box-shadow: var(--shadow-sm); transition: border-color .15s, box-shadow .15s, background .15s; }
+  .tab:hover { background: var(--muted-bg); }
+  .tab.coast { border-top-color: var(--coast); }
+  .tab.lean  { border-top-color: var(--lean); }
+  .tab.fire  { border-top-color: var(--fire); }
+  .tab.fat   { border-top-color: var(--fat); }
+  .tab.active { border-color: var(--ring); box-shadow: 0 0 0 1px var(--ring), var(--shadow-sm); }
+  .tab.coast.active { border-top-color: var(--coast); }
+  .tab.lean.active  { border-top-color: var(--lean); }
+  .tab.fire.active  { border-top-color: var(--fire); }
+  .tab.fat.active   { border-top-color: var(--fat); }
+  .tab .tab-name { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .tab .tab-name::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; background: var(--border); flex: 0 0 auto; }
+  .tab.coast .tab-name::before { background: var(--coast); }
+  .tab.lean  .tab-name::before { background: var(--lean); }
+  .tab.fire  .tab-name::before { background: var(--fire); }
+  .tab.fat   .tab-name::before { background: var(--fat); }
+  .tab .tab-time { display: block; font-size: 19px; font-weight: 600; margin-top: 6px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: var(--foreground); }
+  .tab { position: relative; }
+  .tab .tab-tip { position: absolute; top: calc(100% + 8px); left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 280px; background: var(--foreground); color: #fafafa; font-size: 12px; font-weight: 400; line-height: 1.45; text-align: left; padding: 9px 11px; border-radius: calc(var(--radius) - 2px); box-shadow: var(--shadow); opacity: 0; visibility: hidden; transition: opacity .12s; z-index: 20; pointer-events: none; }
+  .tab .tab-tip b { color: #fff; font-weight: 600; }
+  .tab:hover .tab-tip, .tab:focus-visible .tab-tip { opacity: 1; visibility: visible; }
+  .tab-context { font-size: 13px; color: var(--muted); margin-bottom: 14px; min-height: 18px; }
+  .tab-context b { color: var(--foreground); font-weight: 600; }
   .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; flex: 1 1 0; min-height: 220px; position: relative; box-shadow: var(--shadow-sm); }
   canvas { width: 100%; height: 100%; display: block; }
   .tooltip { position: absolute; pointer-events: none; background: var(--foreground); color: #fafafa; border-radius: calc(var(--radius) - 2px); padding: 6px 10px; font-size: 12px; box-shadow: var(--shadow); opacity: 0; transition: opacity .1s; white-space: nowrap; z-index: 5; }
   .tooltip b { color: #fff; font-weight: 600; }
-  .legend { margin-top: 18px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
-  @media (max-width: 760px) { .legend { grid-template-columns: 1fr; } }
   /* On narrow screens, stack and allow normal page scrolling instead of pinning to the viewport. */
   @media (max-width: 880px) {
     body { height: auto; display: block; overflow: visible; }
@@ -106,11 +120,6 @@
     .main { overflow: visible; }
     .chart-wrap { min-height: 320px; }
   }
-  .legend .item { display: flex; gap: 10px; font-size: 12.5px; align-items: flex-start; }
-  .legend .swatch { width: 13px; height: 13px; border-radius: 4px; flex: 0 0 auto; margin-top: 2px; }
-  .legend .swatch.line { height: 3px; margin-top: 7px; border-radius: 2px; }
-  .legend .name { font-weight: 600; color: var(--foreground); }
-  .legend .def { color: var(--muted); }
   .note { font-size: 11.5px; color: var(--muted); margin-top: 16px; }
   .alloc-bar { display: flex; height: 12px; border-radius: 9999px; overflow: hidden; margin-bottom: 16px; background: var(--muted-bg); }
   .alloc-bar span { display: block; height: 100%; transition: width .15s ease; }
@@ -160,8 +169,13 @@
           <input type="text" inputmode="numeric" class="money" id="income" value="80,000">
         </div>
         <div class="field">
-          <label>Annual spending <span class="val" id="srVal"></span></label>
+          <label>Current annual spending <span class="val" id="srVal"></span></label>
           <input type="text" inputmode="numeric" class="money" id="spending" value="45,000">
+        </div>
+        <div class="field">
+          <label>Retirement annual spending</label>
+          <input type="text" inputmode="numeric" class="money" id="retSpending" value="45,000">
+          <div class="note" style="margin-top:6px">What you'll spend per year in retirement — sets your FIRE targets.</div>
         </div>
       </div>
     </details>
@@ -245,28 +259,29 @@
   </div>
 
   <div class="main">
-    <div class="cards">
-      <div class="card coast">
-        <div class="k">Coast FIRE</div>
-        <div class="v" id="coastV">—</div>
-        <div class="sub" id="coastS">&nbsp;</div>
-      </div>
-      <div class="card lean">
-        <div class="k">Lean FIRE</div>
-        <div class="v" id="leanV2">—</div>
-        <div class="sub" id="leanS">&nbsp;</div>
-      </div>
-      <div class="card fire">
-        <div class="k">FIRE</div>
-        <div class="v" id="fireV">—</div>
-        <div class="sub" id="fireS">&nbsp;</div>
-      </div>
-      <div class="card fat">
-        <div class="k">Fat FIRE</div>
-        <div class="v" id="fatV2">—</div>
-        <div class="sub" id="fatS">&nbsp;</div>
-      </div>
+    <div class="tabs" role="tablist">
+      <button class="tab fire active" data-ms="fire" role="tab" aria-selected="true">
+        <span class="tab-name">FIRE</span>
+        <span class="tab-time" id="fireTime">—</span>
+        <span class="tab-tip">The classic target — a portfolio of 25× your retirement spending (the 4% rule). Reach it and you can retire fully; withdrawals are funded by the portfolio.</span>
+      </button>
+      <button class="tab coast" data-ms="coast" role="tab" aria-selected="false">
+        <span class="tab-name">Coast FIRE</span>
+        <span class="tab-time" id="coastTime">—</span>
+        <span class="tab-tip">Enough invested that, with <b>no further saving</b>, it grows to full FIRE by your coast target age. You only work to cover expenses until then, then draw down.</span>
+      </button>
+      <button class="tab lean" data-ms="lean" role="tab" aria-selected="false">
+        <span class="tab-name">Lean FIRE</span>
+        <span class="tab-time" id="leanTime">—</span>
+        <span class="tab-tip">FIRE on a frugal budget — a smaller nest egg sized to <span id="leanPct">65</span>% of your retirement spending.</span>
+      </button>
+      <button class="tab fat" data-ms="fat" role="tab" aria-selected="false">
+        <span class="tab-name">Fat FIRE</span>
+        <span class="tab-time" id="fatTime">—</span>
+        <span class="tab-tip">FIRE with room to spare — a larger nest egg for <span id="fatPct">180</span>% of your retirement spending.</span>
+      </button>
     </div>
+    <div class="tab-context" id="tabContext">&nbsp;</div>
 
     <div class="chart-toolbar">
       <label class="switch-wrap">
@@ -281,15 +296,7 @@
       <div class="tooltip" id="tip"></div>
     </div>
 
-    <div class="legend">
-      <div class="item"><span class="swatch" style="background:var(--port)"></span><span><span class="name">Your portfolio</span><br><span class="def">Projected balance: invested savings compounding each year.</span></span></div>
-      <div class="item"><span class="swatch line" style="background:var(--coast)"></span><span><span class="name">Coast FIRE</span><br><span class="def">Enough invested <i>now</i> that it grows to full FIRE by your target age with <b>no further saving</b>.</span></span></div>
-      <div class="item"><span class="swatch line" style="background:var(--lean)"></span><span><span class="name">Lean FIRE</span><br><span class="def">Financial independence on a frugal budget (<span id="leanPct">65</span>% of today's spending).</span></span></div>
-      <div class="item"><span class="swatch line" style="background:var(--fire)"></span><span><span class="name">FIRE</span><br><span class="def">The classic target — 25× spending, i.e. the 4% rule.</span></span></div>
-      <div class="item"><span class="swatch line" style="background:var(--fat)"></span><span><span class="name">Fat FIRE</span><br><span class="def">FIRE with room to spare — a richer lifestyle (<span id="fatPct">180</span>% of spending).</span></span></div>
-      <div class="item"><span class="swatch" style="background:var(--marker);border-radius:50%"></span><span><span class="name">Milestone reached</span><br><span class="def">The age your portfolio first crosses each target.</span></span></div>
-    </div>
-    <div class="note">Educational model: constant real return, steady contributions. Ignores taxes, market volatility and sequence-of-returns risk. Not financial advice.</div>
+    <div class="note">Educational model: constant real return, steady contributions until the milestone, then withdrawals with no further saving. Ignores taxes, market volatility and sequence-of-returns risk. Not financial advice.</div>
   </div>
 </div>
 
@@ -307,7 +314,20 @@ const fmtFull = n => '$' + Math.round(n).toLocaleString();
 const numVal = id => +($(id).value.replace(/[^\d.]/g, '')) || 0;
 
 const inputs = ['age','stockRet','bondRet','cashRet','swr','growth','inflation','lean','fat','retAge'];
-const moneyInputs = ['netWorth','income','spending'];
+const moneyInputs = ['netWorth','income','spending','retSpending'];
+let activeMs = 'fire';  // which milestone tab is selected
+
+// Format a fractional number of years as "X yr Y mo".
+function fmtYM(frac) {
+  if (frac === null) return 'not reached';
+  if (frac <= 0) return 'Reached 🎉';
+  let y = Math.floor(frac);
+  let m = Math.round((frac - y) * 12);
+  if (m === 12) { y++; m = 0; }
+  if (y === 0) return `${m} mo`;
+  if (m === 0) return `${y} yr`;
+  return `${y} yr ${m} mo`;
+}
 
 // Live thousands-separator formatting that keeps the caret in place.
 function formatMoneyInput(el) {
@@ -351,7 +371,8 @@ function compute() {
   const age = +$('age').value;
   const nw = numVal('netWorth');
   const income0 = numVal('income');
-  const spending = numVal('spending');
+  const spending = numVal('spending');        // current spending → drives savings
+  const retSpending = numVal('retSpending');  // retirement spending → drives targets
   const r = getAlloc().blended;
   const swr = +$('swr').value / 100;
   const g = +$('growth').value / 100;
@@ -359,9 +380,9 @@ function compute() {
   const fatPct = +$('fat').value / 100;
   const retAge = +$('retAge').value;
 
-  const fireNumber = spending / swr;
-  const leanNumber = spending * leanPct / swr;
-  const fatNumber  = spending * fatPct / swr;
+  const fireNumber = retSpending / swr;
+  const leanNumber = retSpending * leanPct / swr;
+  const fatNumber  = retSpending * fatPct / swr;
   // Coast FIRE target at a given age: amount that compounds to fireNumber by retAge with no contributions.
   const coastTarget = a => a >= retAge ? fireNumber : fireNumber / Math.pow(1 + r, retAge - a);
 
@@ -384,16 +405,49 @@ function compute() {
     if (milestones.fat !== null && y >= milestones.fat + 2) break;
   }
 
+  // Fractional time-to-reach (in years) — interpolate the crossing within the year for month precision.
+  const targetAt = { coast: i => series[i].coast, lean: () => leanNumber, fire: () => fireNumber, fat: () => fatNumber };
+  const times = {};
+  for (const k of ['coast', 'lean', 'fire', 'fat']) {
+    const yr = milestones[k];
+    if (yr === null) { times[k] = null; continue; }
+    if (yr === 0) { times[k] = 0; continue; }
+    const fPrev = series[yr - 1].balance - targetAt[k](yr - 1);
+    const fCur  = series[yr].balance     - targetAt[k](yr);
+    const t = fCur === fPrev ? 1 : Math.max(0, Math.min(1, -fPrev / (fCur - fPrev)));
+    times[k] = (yr - 1) + t;
+  }
+
+  // Build the active tab's full arc: accumulate to the milestone, then draw down (no more contributions).
+  // Coast adds a middle phase: stop saving at the coast point, grow to retAge, then draw down.
+  const targetVal = activeMs === 'lean' ? leanNumber : activeMs === 'fat' ? fatNumber : fireNumber;
+  const isCoast = activeMs === 'coast';
+  const arc = [];
+  let b = nw, inc = income0;
+  let reachYear = null, drawStartYear = null, coasting = false, drawing = false;
+  const maxAge = 95;
+  for (let yi = 0; age + yi <= maxAge; yi++) {
+    const a = age + yi;
+    arc.push({ year: yi, age: a, balance: Math.max(0, b), phase: drawing ? 'draw' : (coasting ? 'coast' : 'accum') });
+    if (isCoast) {
+      if (!coasting && !drawing && b >= coastTarget(a)) { coasting = true; reachYear = yi; }
+      if (coasting && !drawing && a >= retAge) { drawing = true; drawStartYear = yi; }
+    } else if (!drawing && b >= targetVal) {
+      drawing = true; reachYear = yi; drawStartYear = yi;
+    }
+    const contribution = (drawing || coasting) ? 0 : Math.max(0, inc - spending);
+    const withdrawal = drawing ? retSpending : 0;
+    b = b * (1 + r) + contribution - withdrawal;
+    inc *= (1 + g);
+    if (drawing && b <= 0) { arc.push({ year: yi + 1, age: a + 1, balance: 0, phase: 'draw' }); break; }
+    if (drawing && yi - drawStartYear >= 32) break;     // enough drawdown shown
+    if (!drawing && yi >= 60) break;                     // safety: milestone never reached
+  }
+
   const savingsYr = Math.max(0, income0 - spending);
   const savingsRate = income0 > 0 ? savingsYr / income0 : 0;
-  return { age, retAge, fireNumber, leanNumber, fatNumber, coastTarget, series, milestones, savingsRate, leanPct, fatPct };
-}
-
-function setCard(vId, sId, amount, yearReached, age) {
-  $(vId).textContent = fmt(amount);
-  if (yearReached === null) $(sId).textContent = 'not reached by 75';
-  else if (yearReached === 0) $(sId).textContent = 'already there 🎉';
-  else $(sId).textContent = `age ${age + yearReached} · ${yearReached} yr${yearReached === 1 ? '' : 's'}`;
+  return { age, retAge, fireNumber, leanNumber, fatNumber, retSpending, coastTarget, series, milestones, times,
+           savingsRate, leanPct, fatPct, arc, reachYear, drawStartYear, targetVal, activeMs };
 }
 
 function updateLabels() {
@@ -434,13 +488,40 @@ function render() {
   document.querySelectorAll('input[type=range]').forEach(paintRange);
   model = compute();
   const m = model;
-  // In nominal mode, lean/FIRE/fat show the dollars you'll need at the age you reach them.
-  // Coast is always "what you'd need invested today" — a present-value figure, so it doesn't inflate.
+
+  // Each tab shows the years & months until that milestone.
+  $('coastTime').textContent = fmtYM(m.times.coast);
+  $('leanTime').textContent  = fmtYM(m.times.lean);
+  $('fireTime').textContent  = fmtYM(m.times.fire);
+  $('fatTime').textContent   = fmtYM(m.times.fat);
+
+  // Active tab styling + a context line for the selected milestone.
+  const names = { coast: 'Coast FIRE', lean: 'Lean FIRE', fire: 'FIRE', fat: 'Fat FIRE' };
   const nom = (val, yr) => disp(val, yr ?? 0);
-  setCard('coastV','coastS', m.coastTarget(m.age), m.milestones.coast, m.age);
-  setCard('leanV2','leanS', nom(m.leanNumber, m.milestones.lean), m.milestones.lean, m.age);
-  setCard('fireV','fireS',  nom(m.fireNumber, m.milestones.fire), m.milestones.fire, m.age);
-  setCard('fatV2','fatS',   nom(m.fatNumber,  m.milestones.fat),  m.milestones.fat,  m.age);
+  const targetAmt = { coast: m.coastTarget(m.age), lean: nom(m.leanNumber, m.milestones.lean),
+                      fire: nom(m.fireNumber, m.milestones.fire), fat: nom(m.fatNumber, m.milestones.fat) };
+  document.querySelectorAll('.tab').forEach(t => {
+    const on = t.dataset.ms === activeMs;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  const t = m.times[activeMs];
+  const coastNote = activeMs === 'coast' ? ' invested today' : '';
+  const lastArc = m.arc[m.arc.length - 1];
+  // Drawdown tail: once withdrawals start, does the money run out or last past 95?
+  let tail = '';
+  if (m.drawStartYear != null) {
+    tail = lastArc.balance <= 0
+      ? ` Then withdrawing <b>${fmt(m.retSpending)}</b>/yr, savings run dry at age <b>${lastArc.age}</b>.`
+      : ` Then withdrawing <b>${fmt(m.retSpending)}</b>/yr, it still lasts beyond age <b>${lastArc.age}</b>.`;
+  }
+  if (t === null) {
+    $('tabContext').innerHTML = `<b>${names[activeMs]}</b> isn't reached by age 75 — try saving more or trimming spending.`;
+  } else if (t <= 0) {
+    $('tabContext').innerHTML = `You've already reached <b>${names[activeMs]}</b> — needing <b>${fmt(targetAmt[activeMs])}</b>${coastNote}.${tail}`;
+  } else {
+    $('tabContext').innerHTML = `<b>${fmtYM(t)}</b> to <b>${names[activeMs]}</b> at age <b>${m.age + (m.reachYear ?? 0)}</b>, needing <b>${fmt(targetAmt[activeMs])}</b>${coastNote}.${tail}`;
+  }
   draw();
 }
 
@@ -461,11 +542,14 @@ function draw() {
 
   const padL = 58, padR = 16, padT = 16, padB = 30;
   const W = cw - padL - padR, H = ch - padT - padB;
-  const data = m.series;
+  const data = m.arc;
   const maxYear = data[data.length - 1].year || 1;
+  const isCoast = m.activeMs === 'coast';
+  const tCol = getCss(isCoast ? '--coast' : (m.activeMs === 'lean' ? '--lean' : m.activeMs === 'fat' ? '--fat' : '--fire'));
   const dispBal = data.map(d => disp(d.balance, d.year));
-  const dispCoast = data.map(d => disp(d.coast, d.year));
-  const maxBal = Math.max(disp(m.fatNumber, maxYear) * 1.08, ...dispBal);
+  // active target per year: coast is a rising curve toward FIRE; the others are flat (rising only with inflation)
+  const tVal = data.map(d => disp(isCoast ? (d.age <= m.retAge ? m.coastTarget(d.age) : m.fireNumber) : m.targetVal, d.year));
+  const maxBal = Math.max(Math.max(...tVal) * 1.08, ...dispBal, 1);
 
   const x = yr => padL + (yr / maxYear) * W;
   const y = bal => padT + H - (Math.min(bal, maxBal) / maxBal) * H;
@@ -484,61 +568,60 @@ function draw() {
   const xStep = Math.max(1, Math.ceil(maxYear / 8));
   for (let yr = 0; yr <= maxYear; yr += xStep) ctx.fillText('age ' + (m.age + yr), x(yr), padT + H + 8);
 
-  // target curves — flat in real $, rising with inflation in nominal $
-  const targets = [
-    { v: m.leanNumber, c: getCss('--lean'), label: 'Lean' },
-    { v: m.fireNumber, c: getCss('--fire'), label: 'FIRE' },
-    { v: m.fatNumber,  c: getCss('--fat'),  label: 'Fat' },
-  ];
-  ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5;
-  targets.forEach(t => {
-    ctx.strokeStyle = t.c; ctx.beginPath();
-    data.forEach((d, i) => { const px = x(d.year), py = y(disp(t.v, d.year)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
-    ctx.stroke();
-    const endVal = disp(t.v, maxYear);
-    if (endVal <= maxBal) {
-      ctx.fillStyle = t.c; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-      ctx.fillText(t.label + ' ' + fmt(endVal), padL + W, y(endVal) - 3);
-    }
-  });
-  ctx.setLineDash([]);
-
-  // Coast FIRE curve
-  ctx.strokeStyle = getCss('--coast'); ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+  // active target line/curve
+  ctx.strokeStyle = tCol; ctx.lineWidth = 1.8; ctx.setLineDash([6, 5]);
   ctx.beginPath();
-  data.forEach((d, i) => { const px = x(d.year), py = y(dispCoast[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+  data.forEach((d, i) => { const px = x(d.year), py = y(tVal[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
   ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle = getCss('--coast'); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillText('Coast', x(0) + 4, y(dispCoast[0]) + 4);
+  const tLabel = { fire: 'FIRE', coast: 'Coast → FIRE', lean: 'Lean FIRE', fat: 'Fat FIRE' }[m.activeMs];
+  ctx.fillStyle = tCol; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.font = 'bold 11px -apple-system, sans-serif';
+  ctx.fillText(tLabel + ' ' + fmt(isCoast ? m.fireNumber : m.targetVal), x(0) + 4, y(tVal[0]) - 4);
+  ctx.font = '11px -apple-system, sans-serif';
 
-  // portfolio area + line
-  const grad = ctx.createLinearGradient(0, padT, 0, padT + H);
-  grad.addColorStop(0, 'rgba(34,197,94,0.20)');
-  grad.addColorStop(1, 'rgba(34,197,94,0.01)');
-  ctx.beginPath(); ctx.moveTo(x(0), y(0));
-  data.forEach((d, i) => ctx.lineTo(x(d.year), y(dispBal[i])));
-  ctx.lineTo(x(maxYear), y(0)); ctx.closePath();
-  ctx.fillStyle = grad; ctx.fill();
-  ctx.beginPath();
-  data.forEach((d, i) => { const px = x(d.year), py = y(dispBal[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
-  ctx.strokeStyle = getCss('--port'); ctx.lineWidth = 2.5; ctx.stroke();
+  // portfolio arc — accumulation/coast shaded green, drawdown shaded red
+  const ds = m.drawStartYear;                 // index where withdrawals begin (null if never reached)
+  const lastI = data.length - 1;
+  function fillArea(i0, i1, rgb) {
+    if (i1 <= i0) return;
+    const g = ctx.createLinearGradient(0, padT, 0, padT + H);
+    g.addColorStop(0, `rgba(${rgb},0.20)`); g.addColorStop(1, `rgba(${rgb},0.01)`);
+    ctx.beginPath(); ctx.moveTo(x(data[i0].year), y(0));
+    for (let i = i0; i <= i1; i++) ctx.lineTo(x(data[i].year), y(dispBal[i]));
+    ctx.lineTo(x(data[i1].year), y(0)); ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+  }
+  fillArea(0, ds === null ? lastI : ds, '34,197,94');
+  if (ds !== null) fillArea(ds, lastI, '239,68,68');
 
-  // milestone markers
-  const ms = m.milestones;
-  const markerDefs = [
-    { y: ms.coast, getVal: d => d.coast, label: 'Coast' },
-    { y: ms.lean,  getVal: () => m.leanNumber, label: 'Lean' },
-    { y: ms.fire,  getVal: () => m.fireNumber, label: 'FIRE' },
-    { y: ms.fat,   getVal: () => m.fatNumber,  label: 'Fat' },
-  ];
-  markerDefs.forEach(md => {
-    if (md.y === null) return;
-    const d = data.find(p => p.year === md.y); if (!d) return;
-    const px = x(d.year), py = y(disp(d.balance, d.year));
+  // arc line, colored per phase (green = growing, red = drawing down)
+  ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  for (let i = 1; i < data.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(x(data[i - 1].year), y(dispBal[i - 1]));
+    ctx.lineTo(x(data[i].year), y(dispBal[i]));
+    ctx.strokeStyle = getCss(data[i].phase === 'draw' ? '--marker' : '--port');
+    ctx.stroke();
+  }
+
+  // retirement-point markers
+  function pinMarker(i, label) {
+    if (i == null || !data[i]) return;
+    const px = x(data[i].year), py = y(dispBal[i]);
     ctx.fillStyle = getCss('--marker');
-    ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-  });
+    ctx.fillStyle = getCss('--foreground'); ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.font = 'bold 11px -apple-system, sans-serif';
+    ctx.fillText(label, px, py - 11);
+  }
+  if (isCoast) {
+    if (m.reachYear != null) pinMarker(m.reachYear, 'Coast · age ' + data[m.reachYear].age);
+    if (m.drawStartYear != null) pinMarker(m.drawStartYear, 'Retire · age ' + data[m.drawStartYear].age);
+  } else if (m.reachYear != null) {
+    pinMarker(m.reachYear, tLabel + ' · age ' + data[m.reachYear].age);
+  }
+  ctx.font = '11px -apple-system, sans-serif';
 
   // hover crosshair (vertical timeline)
   if (hoverYear !== null) {
@@ -582,9 +665,12 @@ canvas.addEventListener('mousemove', e => {
   if (yr !== hoverYear) { hoverYear = yr; draw(); }
   const d = geom.data.find(p => p.year === yr) || geom.data[geom.data.length - 1];
   const shown = disp(d.balance, d.year);
-  const pctFire = Math.min(100, (d.balance / m.fireNumber) * 100);
+  const tgt = m.activeMs === 'coast' ? m.fireNumber : m.targetVal;
+  const pct = Math.min(100, (d.balance / tgt) * 100);
+  const tabName = { coast: 'Coast', lean: 'Lean', fire: 'FIRE', fat: 'Fat' }[m.activeMs];
+  const phase = d.phase === 'draw' ? ' · drawing down' : '';
   const unit = nominalOn() ? ` <span style="opacity:.65">(${m.age + d.year} $)</span>` : '';
-  tip.innerHTML = `Age <b>${d.age}</b> · year <b>${d.year}</b> · <b>${fmtFull(shown)}</b>${unit} · ${pctFire.toFixed(0)}% of FIRE`;
+  tip.innerHTML = `Age <b>${d.age}</b> · <b>${fmtFull(shown)}</b>${unit} · ${pct.toFixed(0)}% of ${tabName}${phase}`;
   tip.style.left = Math.min(geom.x(d.year) + 12, rect.width - 250) + 'px';
   tip.style.top = (geom.y(shown) - 10) + 'px';
   tip.style.opacity = 1;
@@ -595,6 +681,7 @@ inputs.forEach(id => $(id).addEventListener('input', render));
 moneyInputs.forEach(id => $(id).addEventListener('input', e => { formatMoneyInput(e.target); render(); }));
 ['stock','bond'].forEach(id => $(id).addEventListener('input', () => { balanceAlloc(id); render(); }));
 $('nominalToggle').addEventListener('change', render);
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { activeMs = t.dataset.ms; render(); }));
 window.addEventListener('resize', () => model && draw());
 render();
 </script>
